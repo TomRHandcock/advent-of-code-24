@@ -78,6 +78,9 @@ func checkReport(report []int) bool {
 }
 
 func isReportSafe(report []int, tolerance int) bool {
+	if checkReport(report) {
+		return true
+	}
 	if tolerance == 0 {
 		return checkReport(report)
 	}
