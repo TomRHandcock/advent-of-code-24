@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -21,6 +22,9 @@ func main() {
 	handleError(err)
 	levels, err := parseLevels(lines)
 	handleError(err)
+	safeReportCount := countSafeReports(levels)
+	fmt.Printf("Safe report count: %d", safeReportCount)
+
 }
 
 func readLines(filepath string) ([]string, error) {
@@ -50,4 +54,34 @@ func parseLevels(lines []string) ([]([]int), error) {
 		parsedReports = append(parsedReports, parsedReport)
 	}
 	return parsedReports, nil
+}
+
+func isReportSafe(report []int) bool {
+	shouldBeAscending := report[0] < report[1]
+	for index := range report {
+		if index == len(report)-1 {
+			break
+		}
+		nextIndex := index + 1
+		if shouldBeAscending && report[index] > report[nextIndex] {
+			return false
+		} else if !shouldBeAscending && report[index] < report[nextIndex] {
+			return false
+		}
+		difference := math.Abs(float64(report[index]) - float64(report[nextIndex]))
+		if difference < 1 || difference > 3 {
+			return false
+		}
+	}
+	return true
+}
+
+func countSafeReports(reports []([]int)) int {
+	count := 0
+	for _, report := range reports {
+		if isReportSafe(report) {
+			count++
+		}
+	}
+	return count
 }
