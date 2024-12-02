@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -56,7 +57,7 @@ func parseLevels(lines []string) ([]([]int), error) {
 	return parsedReports, nil
 }
 
-func isReportSafe(report []int) bool {
+func checkReport(report []int) bool {
 	shouldBeAscending := report[0] < report[1]
 	for index := range report {
 		if index == len(report)-1 {
@@ -76,10 +77,25 @@ func isReportSafe(report []int) bool {
 	return true
 }
 
+func isReportSafe(report []int, tolerance int) bool {
+	if tolerance == 0 {
+		return checkReport(report)
+	}
+	for droppedIndex := range report {
+		maskedReport := make([]int, len(report))
+		copy(maskedReport, report)
+		maskedReport = slices.Delete(maskedReport, droppedIndex, droppedIndex+1)
+		if isReportSafe(maskedReport, tolerance-1) {
+			return true
+		}
+	}
+	return false
+}
+
 func countSafeReports(reports []([]int)) int {
 	count := 0
 	for _, report := range reports {
-		if isReportSafe(report) {
+		if isReportSafe(report, 1) {
 			count++
 		}
 	}
